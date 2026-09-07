@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+            <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -130,7 +130,7 @@
             font-size: 0.9rem;
             font-weight: bold;
             color: var(--text-dark);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; /* Keeps digits stable */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         .btn-delete {
@@ -193,7 +193,7 @@
 </div>
 
 <script>
-    let tasks = JSON.parse(localStorage.getItem('notion_serif_tracker')) || [];
+    let tasks = JSON.parse(localStorage.getItem('notion_serif_tracker_bolt')) || [];
     let activeTaskId = null;
     let timerInterval = null;
 
@@ -216,7 +216,7 @@
     }
 
     function saveAndRender() {
-        localStorage.setItem('notion_serif_tracker', JSON.stringify(tasks));
+        localStorage.setItem('notion_serif_tracker_bolt', JSON.stringify(tasks));
         const listEl = document.getElementById('taskList');
         listEl.innerHTML = '';
 
@@ -285,3 +285,20 @@
     }
 
     function resetAll() {
+        if (confirm("Clear all items?")) {
+            clearInterval(timerInterval);
+            activeTaskId = null;
+            tasks = [];
+            saveAndRender();
+        }
+    }
+
+    document.getElementById('taskInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') addTask();
+    });
+
+    saveAndRender();
+</script>
+
+</body>
+</html>
