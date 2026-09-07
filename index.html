@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aesthetic Pink Time Tracker</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 100%);
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --pink-dark: #d47a84;
+            --pink-light: #ffb6c1;
+            --text-main: #5c4749;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            margin: 0;
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .tracker-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px;
+            width: 100%;
+            max-width: 340px;
+            box-shadow: 0 8px 32px 0 rgba(220, 180, 185, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 1.2rem;
+            text-align: center;
+            color: var(--pink-dark);
+            letter-spacing: 0.5px;
+        }
+
+        .task-input-box {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        input {
+            flex: 1;
+            border: 1px solid rgba(212, 122, 132, 0.3);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 12px;
+            border-radius: 8px;
+            color: var(--text-main);
+            outline: none;
+        }
+
+        input::placeholder { color: #bcaeb0; }
+
+        button {
+            background: var(--pink-dark);
+            color: white;
+            border: none;
+            padding: 0 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        button:hover { opacity: 0.9; }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task-item {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 14px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(212, 122, 132, 0.1);
+        }
+
+        .task-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .task-name { font-weight: 500; font-size: 0.95rem; }
+        .task-time { font-size: 0.85rem; color: #8e797b; margin-top: 2px; }
+
+        .action-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-play { background: #a3c9a8; padding: 6px 12px; font-size: 0.8rem; }
+        .btn-play.active { background: #f3b05a; }
+        .btn-delete { background: rgba(212, 122, 132, 0.1); color: var(--pink-dark); padding: 6px 10px; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+<div class="tracker-container">
+    <h2>🌸 Pink Time Tracker</h2>
+    <div class="task-input-box">
+        <input type="text" id="taskInput" placeholder="Enter task name...">
+        <button onclick="addTask()">Add</button>
+    </div>
+    <div class="task-list" id="taskList"></div>
+</div>
+
+<script>
+    let tasks = JSON.parse(localStorage.getItem('notion_tasks')) || [];
+    let activeTaskId = null;
+    let timerInterval = null;
+
+    function saveAndRender() {
+        localStorage.setItem('notion_tasks', JSON.stringify(tasks));
+        const listEl = document.getElementById('taskList');
+        listEl.innerHTML = '';
+
+        tasks.forEach(task => {
+            const item = document.createElement('div');
+            item.className = 'task-item';
+            
+            const hours = String(Math.floor(task.seconds / 3600)).padStart(2, '0');
+            const minutes = String(Math.floor((task.seconds % 3600) / 60)).padStart(2, '0');
+            const secs = String(task.seconds % 60).padStart(2, '0');
+
+            const isActive = task.id === activeTaskId;
+
+            item.innerHTML = `
+                <div class="task-info">
+                    <span class="task-name">${task.name}</span>
+                    <span class="task-time">${hours}:${minutes}:${secs}</span>
+                </div>
+                <div class="action-btns">
+                    <button class="btn-play ${isActive ? 'active' : ''}" onclick="toggleTask(${task.id})">
+                        ${isActive ? 'Pause' : 'Play'}
+                    </button>
+                    <button class="btn-delete" onclick="deleteTask(${task.id})">✕</button>
+                </div>
+            `;
+            listEl.appendChild(item);
+        });
+    }
+
+    function addTask() {
+        const input = document.getElementById('taskInput');
+        if (!input.value.trim()) return;
+        
+        tasks.push({
+            id: Date.now(),
+            name: input.value.trim(),
+            seconds: 0
+        });
+        input.value = '';
+        saveAndRender();
+    }
+
+    function toggleTask(id) {
+        if (activeTaskId === id) {
+            clearInterval(timerInterval);
+            activeTaskId = null;
+        } else {
+            clearInterval(timerInterval);
+            activeTaskId = id;
+            timerInterval = setInterval(() => {
+                const task = tasks.find(t => t.id === activeTaskId);
+                if (task) {
+                    task.seconds++;
+                    saveAndRender();
+                }
+            }, 1000);
+        }
+        saveAndRender();
+    }
+
+    function deleteTask(id) {
+        if (activeTaskId === id) {
+            clearInterval(timerInterval);
+            activeTaskId = null;
+        }
+        tasks = tasks.filter(t => t.id !== id);
+        saveAndRender();
+    }
+
+    saveAndRender();
+</script>
+
+</body>
+</html>
