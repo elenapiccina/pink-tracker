@@ -5,94 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Time Tracker 🚀</title>
     <style>
-        :root {
-            --bg-gradient: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 100%);
-            --card-bg: rgba(255, 255, 255, 0.7);
-            --pink-dark: #d47a84;
-            --pink-light: #ffb6c1;
-            --text-main: #5c4749;
-        }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: var(--bg-gradient);
-            color: var(--text-main);
+            background-color: #fff0f3;
             margin: 0;
-            padding: 16px;
+            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
         }
 
-        .tracker-container {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 24px;
+        .tracker-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 32px;
             width: 100%;
-            max-width: 340px;
-            box-shadow: 0 8px 32px 0 rgba(220, 180, 185, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            position: relative;
+            max-width: 480px;
+            box-shadow: 0 10px 30px rgba(242, 92, 138, 0.06);
+            box-sizing: border-box;
         }
 
-        .header-area {
+        .header-container {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            margin-bottom: 16px;
+            position: relative;
+            margin-bottom: 24px;
         }
 
-        h2 {
+        .title {
+            color: #d46b79;
+            font-size: 1.6rem;
+            font-weight: 700;
             margin: 0;
-            font-size: 1.2rem;
-            color: var(--pink-dark);
-            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-reset {
-            background: rgba(214, 122, 132, 0.15);
-            color: var(--pink-dark);
+            position: absolute;
+            right: 0;
+            background: none;
             border: none;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 0.75rem;
+            color: #d46b79;
+            font-size: 0.8rem;
             cursor: pointer;
-            font-weight: bold;
+            opacity: 0.6;
+            padding: 4px;
         }
-        .btn-reset:hover { background: rgba(214, 122, 132, 0.25); }
+        .btn-reset:hover { opacity: 1; }
 
-        .task-input-box {
+        .input-row {
             display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
         input {
             flex: 1;
-            border: 1px solid rgba(212, 122, 132, 0.3);
-            background: rgba(255, 255, 255, 0.9);
-            padding: 10px 12px;
-            border-radius: 8px;
-            color: var(--text-main);
+            border: 1px solid #ebd6da;
+            border-radius: 12px;
+            padding: 14px 16px;
+            font-size: 0.95rem;
+            color: #4a3b3d;
             outline: none;
+            background: #ffffff;
         }
+        input::placeholder { color: #ccbdc0; }
 
-        input::placeholder { color: #bcaeb0; }
-
-        button.btn-add {
-            background: var(--pink-dark);
+        .btn-add {
+            background-color: #d46b79;
             color: white;
             border: none;
-            padding: 0 16px;
-            border-radius: 8px;
+            border-radius: 12px;
+            padding: 0 24px;
+            font-size: 0.95rem;
+            font-weight: 600;
             cursor: pointer;
-            font-weight: bold;
             transition: opacity 0.2s;
         }
-
-        button.btn-add:hover { opacity: 0.9; }
+        .btn-add:hover { opacity: 0.9; }
 
         .task-list {
             display: flex;
@@ -101,61 +95,88 @@
         }
 
         .task-item {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 14px;
-            border-radius: 10px;
+            border: 1px solid #fcf0f2;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 1px solid rgba(212, 122, 132, 0.1);
+            box-shadow: 0 4px 12px rgba(242, 92, 138, 0.02);
         }
 
-        .task-info {
+        .task-details {
             display: flex;
             flex-direction: column;
         }
 
-        .task-name { font-weight: 500; font-size: 0.95rem; }
-        .task-time { font-size: 0.85rem; color: #8e797b; margin-top: 2px; }
+        .task-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #4a3b3d;
+            margin-bottom: 4px;
+        }
 
-        .action-btns {
+        .task-time {
+            font-size: 0.95rem;
+            color: #a39294;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .action-group {
             display: flex;
-            gap: 6px;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-control {
             border: none;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 0.8rem;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
             cursor: pointer;
-            font-weight: 500;
+            min-width: 75px;
+            text-align: center;
         }
 
-        .btn-play { background: #e3f9e5; color: #2e7d32; }
-        .btn-play.active { background: #fff3cd; color: #856404; }
-        .btn-stop { background: #f8d7da; color: #721c24; }
-        .btn-delete { background: rgba(212, 122, 132, 0.1); color: var(--pink-dark); }
+        .btn-play { background-color: #a7cca9; color: white; }
+        .btn-stop { background-color: #e8a7b0; color: white; }
+
+        .btn-delete {
+            background-color: #fdf2f4;
+            color: #d46b79;
+            border: none;
+            border-radius: 10px;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .btn-delete:hover { background-color: #fbdde2; }
     </style>
 </head>
 <body>
 
-<div class="tracker-container">
-    <div class="header-area">
-        <h2>Time Tracker 🚀</h2>
-        <button class="btn-reset" onclick="resetAll()">🔄 Reset All</button>
+<div class="tracker-card">
+    <div class="header-container">
+        <h1 class="title">Time Tracker 🚀</h1>
+        <button class="btn-reset" onclick="resetAll()">Clear All</button>
     </div>
-    
-    <div class="task-input-box">
+
+    <div class="input-row">
         <input type="text" id="taskInput" placeholder="Enter task name...">
         <button class="btn-add" onclick="addTask()">Add</button>
     </div>
-    
+
     <div class="task-list" id="taskList"></div>
 </div>
 
 <script>
-    let tasks = JSON.parse(localStorage.getItem('notion_tasks_v3')) || [];
+    let tasks = JSON.parse(localStorage.getItem('notion_tasks_final')) || [];
     let activeTaskId = null;
     let timerInterval = null;
 
@@ -167,27 +188,26 @@
     }
 
     function saveAndRender() {
-        localStorage.setItem('notion_tasks_v3', JSON.stringify(tasks));
+        localStorage.setItem('notion_tasks_final', JSON.stringify(tasks));
         const listEl = document.getElementById('taskList');
         listEl.innerHTML = '';
 
         tasks.forEach(task => {
             const item = document.createElement('div');
             item.className = 'task-item';
-            
             const isActive = task.id === activeTaskId;
 
             item.innerHTML = `
-                <div class="task-info">
+                <div class="task-details">
                     <span class="task-name">${task.name}</span>
                     <span class="task-time">${formatTime(task.seconds)}</span>
                 </div>
-                <div class="action-btns">
+                <div class="action-group">
                     ${isActive ? 
-                        `<button class="btn-control btn-stop" onclick="stopTask()">🛑 Stop</button>` : 
-                        `<button class="btn-control btn-play" onclick="startTask(${task.id})">▶ Play</button>`
+                        `<button class="btn-control btn-stop" onclick="stopTask()">Stop</button>` : 
+                        `<button class="btn-control btn-play" onclick="startTask(${task.id})">Play</button>`
                     }
-                    <button class="btn-control btn-delete" onclick="deleteTask(${task.id})">✕</button>
+                    <button class="btn-delete" onclick="deleteTask(${task.id})">✕</button>
                 </div>
             `;
             listEl.appendChild(item);
@@ -227,22 +247,19 @@
     }
 
     function deleteTask(id) {
-        if (activeTaskId === id) {
-            stopTask();
-        }
+        if (activeTaskId === id) stopTask();
         tasks = tasks.filter(t => t.id !== id);
         saveAndRender();
     }
 
     function resetAll() {
-        if (confirm("Clear all your tracked tasks?")) {
+        if (confirm("Reset everything?")) {
             stopTask();
             tasks = [];
             saveAndRender();
         }
     }
 
-    // Allow hitting "Enter" to add tasks
     document.getElementById('taskInput').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') addTask();
     });
