@@ -3,333 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time Tracker ⚡️</title>
+    <title>Time Tracker 🚀</title>
     <style>
         :root {
-            --pink-header: #f25c8a;
-            --pink-bg: #fff0f3;
-            --pink-text: #b83b5e;
-            --text-dark: #4a3b3d;
-            --card-white: #ffffff;
+            --bg-gradient: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 100%);
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --pink-dark: #d47a84;
+            --pink-light: #ffb6c1;
+            --text-main: #5c4749;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--pink-bg);
+            background: var(--bg-gradient);
+            color: var(--text-main);
             margin: 0;
-            padding: 0;
+            padding: 16px;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
+            align-items: center;
             min-height: 100vh;
         }
 
-        .widget-container {
+        .tracker-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px;
             width: 100%;
-            max-width: 550px;
-            background: var(--card-white);
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(242, 92, 138, 0.1);
-            overflow: hidden;
-            margin: 16px;
+            max-width: 340px;
+            box-shadow: 0 8px 32px 0 rgba(220, 180, 185, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            position: relative;
         }
 
-        /* Top Header Bar */
-        .header-bar {
-            background-color: var(--pink-header);
-            color: white;
-            padding: 12px 16px;
+        .header-area {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 16px;
         }
 
-        .header-title {
-            font-size: 1.1rem;
+        h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--pink-dark);
+            letter-spacing: 0.5px;
+        }
+
+        .btn-reset {
+            background: rgba(214, 122, 132, 0.15);
+            color: var(--pink-dark);
+            border: none;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
             font-weight: bold;
         }
+        .btn-reset:hover { background: rgba(214, 122, 132, 0.25); }
 
-        .header-controls {
+        .task-input-box {
             display: flex;
-            gap: 12px;
-            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
         }
 
-        .btn-header-reset {
-            background: rgba(255, 255, 255, 0.2);
+        input {
+            flex: 1;
+            border: 1px solid rgba(212, 122, 132, 0.3);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 12px;
+            border-radius: 8px;
+            color: var(--text-main);
+            outline: none;
+        }
+
+        input::placeholder { color: #bcaeb0; }
+
+        button.btn-add {
+            background: var(--pink-dark);
             color: white;
             border: none;
-            padding: 4px 10px;
+            padding: 0 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        button.btn-add:hover { opacity: 0.9; }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task-item {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 14px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(212, 122, 132, 0.1);
+        }
+
+        .task-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .task-name { font-weight: 500; font-size: 0.95rem; }
+        .task-time { font-size: 0.85rem; color: #8e797b; margin-top: 2px; }
+
+        .action-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-control {
+            border: none;
+            padding: 6px 10px;
             border-radius: 6px;
             font-size: 0.8rem;
             cursor: pointer;
             font-weight: 500;
         }
-        .btn-header-reset:hover { background: rgba(255, 255, 255, 0.35); }
 
-        /* Main Counter Display Block */
-        .main-display {
-            padding: 16px;
-            border-bottom: 1px solid #ffe3e8;
-        }
-
-        .active-timer {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--pink-text);
-            margin: 0;
-        }
-
-        .timeline-label {
-            display: flex;
-            justify-content: flex-end;
-            font-size: 0.8rem;
-            color: #bfa3a7;
-            margin-top: -10px;
-        }
-
-        /* Task Row Layout */
-        .task-list {
-            padding: 8px 16px;
-        }
-
-        .task-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #fff0f2;
-        }
-
-        .task-item:last-child { border-bottom: none; }
-
-        .task-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .play-trigger {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: #fff0f3;
-            border: 1px solid #ffd1dc;
-            color: var(--pink-text);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 0.85rem;
-        }
-        .play-trigger.active {
-            background: #e3f9e5;
-            border-color: #a3e0a8;
-            color: #2e7d32;
-        }
-
-        .task-details {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .task-name {
-            font-weight: 500;
-            color: var(--pink-text);
-            font-size: 0.95rem;
-        }
-
-        .task-meta {
-            font-size: 0.75rem;
-            color: #a39294;
-            margin-top: 2px;
-        }
-
-        .task-right {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .task-duration {
-            font-weight: bold;
-            color: var(--pink-text);
-            font-size: 1rem;
-            min-width: 65px;
-            text-align: right;
-        }
-
-        .control-actions-group {
-            display: flex;
-            gap: 4px;
-        }
-
-        .btn-action {
-            background: none;
-            border: none;
-            color: #a39294;
-            cursor: pointer;
-            padding: 6px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-        }
-        .btn-action:hover {
-            background: #fff0f2;
-            color: var(--pink-text);
-        }
-
-        /* Input Bar Layout */
-        .input-bar {
-            display: flex;
-            border-top: 1px solid #ffe3e8;
-            background: #fafafa;
-        }
-
-        .input-bar input {
-            flex: 1;
-            border: none;
-            padding: 14px 16px;
-            outline: none;
-            font-size: 0.9rem;
-            background: transparent;
-        }
-        .input-bar input::placeholder { color: #ccbdc0; }
-
-        .btn-add {
-            background: var(--pink-header);
-            color: white;
-            border: none;
-            padding: 0 24px;
-            font-weight: bold;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
-        .btn-add:hover { opacity: 0.9; }
-
-        /* Archive View Drawer */
-        .archive-section {
-            background: #fafafa;
-            border-top: 1px solid #ffe3e8;
-            padding: 12px 16px;
-        }
-        .archive-title {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #a39294;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-        .archive-item {
-            font-size: 0.85rem;
-            color: #736264;
-            display: flex;
-            justify-content: space-between;
-            padding: 4px 0;
-        }
+        .btn-play { background: #e3f9e5; color: #2e7d32; }
+        .btn-play.active { background: #fff3cd; color: #856404; }
+        .btn-stop { background: #f8d7da; color: #721c24; }
+        .btn-delete { background: rgba(212, 122, 132, 0.1); color: var(--pink-dark); }
     </style>
 </head>
 <body>
 
-<div class="widget-container">
-    <!-- Header -->
-    <div class="header-bar">
-        <div class="header-title">Time Tracker ⚡️</div>
-        <div class="header-controls">
-            <button class="btn-header-reset" onclick="resetAll()">🔄 Reset All</button>
-        </div>
+<div class="tracker-container">
+    <div class="header-area">
+        <h2>Time Tracker 🚀</h2>
+        <button class="btn-reset" onclick="resetAll()">🔄 Reset All</button>
     </div>
-
-    <!-- Main Counter Block -->
-    <div class="main-display">
-        <div class="active-timer" id="globalDisplay">0:00:00</div>
-        <div class="timeline-label">today</div>
-    </div>
-
-    <!-- Tasks List Area -->
-    <div class="task-list" id="taskList"></div>
-
-    <!-- Bottom Input Area -->
-    <div class="input-bar">
-        <input type="text" id="taskInput" placeholder="add a task — e.g. deep work">
+    
+    <div class="task-input-box">
+        <input type="text" id="taskInput" placeholder="Enter task name...">
         <button class="btn-add" onclick="addTask()">Add</button>
     </div>
-
-    <!-- Archive Storage View -->
-    <div class="archive-section" id="archiveSection" style="display: none;">
-        <div class="archive-title">📦 Archived History</div>
-        <div id="archiveList"></div>
-    </div>
+    
+    <div class="task-list" id="taskList"></div>
 </div>
 
 <script>
-    let tasks = JSON.parse(localStorage.getItem('notion_tracker_v2')) || [];
-    let archive = JSON.parse(localStorage.getItem('notion_archive_v2')) || [];
+    let tasks = JSON.parse(localStorage.getItem('notion_tasks_v3')) || [];
     let activeTaskId = null;
     let timerInterval = null;
 
     function formatTime(totalSeconds) {
-        const hours = String(Math.floor(totalSeconds / 3600)).padStart(1, '0');
+        const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
         const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
         const secs = String(totalSeconds % 60).padStart(2, '0');
         return `${hours}:${minutes}:${secs}`;
     }
 
     function saveAndRender() {
-        localStorage.setItem('notion_tracker_v2', JSON.stringify(tasks));
-        localStorage.setItem('notion_archive_v2', JSON.stringify(archive));
-        
+        localStorage.setItem('notion_tasks_v3', JSON.stringify(tasks));
         const listEl = document.getElementById('taskList');
         listEl.innerHTML = '';
-
-        // Update active top counter block display
-        const activeTask = tasks.find(t => t.id === activeTaskId);
-        document.getElementById('globalDisplay').innerText = activeTask ? formatTime(activeTask.seconds) : "0:00:00";
 
         tasks.forEach(task => {
             const item = document.createElement('div');
             item.className = 'task-item';
+            
             const isActive = task.id === activeTaskId;
 
             item.innerHTML = `
-                <div class="task-left">
-                    <button class="play-trigger ${isActive ? 'active' : ''}" onclick="toggleTask(${task.id})">
-                        ${isActive ? '⏸' : '▶'}
-                    </button>
-                    <div class="task-details">
-                        <span class="task-name">${task.name}</span>
-                        <span class="task-meta">tracked today</span>
-                    </div>
+                <div class="task-info">
+                    <span class="task-name">${task.name}</span>
+                    <span class="task-time">${formatTime(task.seconds)}</span>
                 </div>
-                <div class="task-right">
-                    <span class="task-duration">${formatTime(task.seconds)}</span>
-                    <div class="control-actions-group">
-                        <button class="btn-action" title="Stop & Archive" onclick="stopAndArchiveTask(${task.id})">🛑 Stop & Archive</button>
-                        <button class="btn-action" title="Delete" onclick="deleteTask(${task.id})">✕</button>
-                    </div>
+                <div class="action-btns">
+                    ${isActive ? 
+                        `<button class="btn-control btn-stop" onclick="stopTask()">🛑 Stop</button>` : 
+                        `<button class="btn-control btn-play" onclick="startTask(${task.id})">▶ Play</button>`
+                    }
+                    <button class="btn-control btn-delete" onclick="deleteTask(${task.id})">✕</button>
                 </div>
             `;
             listEl.appendChild(item);
         });
-
-        // Handle Archive UI render block
-        const archiveSection = document.getElementById('archiveSection');
-        const archiveList = document.getElementById('archiveList');
-        if (archive.length > 0) {
-            archiveSection.style.display = 'block';
-            archiveList.innerHTML = '';
-            archive.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'archive-item';
-                div.innerHTML = `<span>✅ ${item.name}</span> <span>${formatTime(item.seconds)}</span>`;
-                archiveList.appendChild(div);
-            });
-        } else {
-            archiveSection.style.display = 'none';
-        }
     }
 
     function addTask() {
         const input = document.getElementById('taskInput');
         if (!input.value.trim()) return;
         
+        tasks.push({
+            id: Date.now(),
+            name: input.value.trim(),
+            seconds: 0
+        });
+        input.value = '';
+        saveAndRender();
+    }
+
+    function startTask(id) {
+        clearInterval(timerInterval);
+        activeTaskId = id;
+        timerInterval = setInterval(() => {
+            const task = tasks.find(t => t.id === activeTaskId);
+            if (task) {
+                task.seconds++;
+                saveAndRender();
+            }
+        }, 1000);
+        saveAndRender();
+    }
+
+    function stopTask() {
+        clearInterval(timerInterval);
+        activeTaskId = null;
+        saveAndRender();
+    }
+
+    function deleteTask(id) {
+        if (activeTaskId === id) {
+            stopTask();
+        }
+        tasks = tasks.filter(t => t.id !== id);
+        saveAndRender();
+    }
+
+    function resetAll() {
+        if (confirm("Clear all your tracked tasks?")) {
+            stopTask();
+            tasks = [];
+            saveAndRender();
+        }
+    }
+
+    // Allow hitting "Enter" to add tasks
+    document.getElementById('taskInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') addTask();
+    });
+
+    saveAndRender();
+</script>
+
+</body>
+</html>
