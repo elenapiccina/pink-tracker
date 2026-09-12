@@ -1,304 +1,628 @@
-            <!DOCTYPE html>
+   <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time Tracker ⚡️</title>
+    <title>Time Tracker ⏳</title>
+
+    <!-- Google Font: Alice -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alice&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --pink-accent: #F1D2DF;
-            --grey-text: #8F939A;
-            --text-dark: #4A4A4A;
-            --bg-light: #FAFAFA;
+            /* Palette & Quiet Luxury Theme Tokens */
+            --bg-powder-pink: #F2D3E2;
+            --text-header-grey: #92959C;
+            
+            /* Active Mint State */
+            --bg-mint-active: #E1F3ED;
+            --border-sage-active: #ACD1C7;
+            --text-sage-deep: #2A5248;
+            --mint-badge-glow: rgba(172, 209, 199, 0.45);
+            
+            /* Idle State */
+            --bg-idle: #FFFFFF;
+            --border-idle: #F4E8EE;
+            --text-idle-dark: #322527;
+            --text-idle-grey: #92959C;
+
+            /* Glass Container */
+            --bg-glass: rgba(255, 255, 255, 0.88);
+            --border-glass: rgba(255, 255, 255, 0.95);
+            --shadow-soft: 0 12px 32px rgba(180, 150, 165, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+            font-family: 'Alice', Georgia, serif;
             background-color: transparent;
-            margin: 0;
-            padding: 8px;
+            padding: 12px;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            color: var(--text-idle-dark);
+            -webkit-font-smoothing: antialiased;
         }
 
         .widget-container {
             width: 100%;
-            max-width: 480px;
-            background: #ffffff;
-            border-radius: 8px;
-            border: 1px solid #EBEBEB;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
-            overflow: hidden;
-            box-sizing: border-box;
+            max-width: 520px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: var(--shadow-soft);
+            position: relative;
         }
 
-        /* Compact Header Bar */
-        .header-bar {
-            background-color: var(--pink-accent);
-            padding: 6px 12px;
+        /* 1. Header Banner */
+        .header-banner {
+            background-color: var(--bg-powder-pink);
+            padding: 10px 14px;
+            border-radius: 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 12px;
         }
 
         .header-title {
-            font-size: 0.85rem;
+            font-size: 0.92rem;
+            letter-spacing: 0.6px;
+            color: var(--text-header-grey);
             font-weight: bold;
-            color: var(--text-dark);
-            letter-spacing: 0.3px;
-        }
-
-        .btn-reset {
-            background: none;
-            border: none;
-            color: var(--text-dark);
-            font-size: 0.75rem;
-            font-family: inherit;
-            cursor: pointer;
-            opacity: 0.7;
-            padding: 2px 6px;
-        }
-        .btn-reset:hover { opacity: 1; }
-
-        /* Compact Task Row Layout */
-        .task-list {
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
         }
 
-        .task-item {
+        .btn-clear-all {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(146, 149, 156, 0.25);
+            border-radius: 8px;
+            color: var(--text-header-grey);
+            font-family: 'Alice', serif;
+            font-size: 0.72rem;
+            padding: 4px 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-clear-all:hover {
+            background: #ffffff;
+            color: #555860;
+            border-color: rgba(146, 149, 156, 0.5);
+            transform: translateY(-1px);
+        }
+
+        /* Stats Sub-Bar */
+        .stats-summary {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 12px;
-            border-bottom: 1px solid #F7F7F7;
+            padding: 0 4px 10px 4px;
+            font-size: 0.76rem;
+            color: var(--text-idle-grey);
+            border-bottom: 1px dashed var(--border-idle);
+            margin-bottom: 12px;
         }
-        .task-item:last-child { border-bottom: none; }
 
-        .task-left {
+        .stats-count strong {
+            color: var(--text-idle-dark);
+        }
+
+        /* Task List */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        /* Task Row Cards */
+        .task-card {
+            border-radius: 14px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
+            position: relative;
+
+            /* Default Idle State */
+            background-color: var(--bg-idle);
+            border: 1px solid var(--border-idle);
+            color: var(--text-idle-dark);
+        }
+
+        .task-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        /* 2. Active Playing State Styles */
+        .task-card.is-playing {
+            background-color: var(--bg-mint-active);
+            border: 1.5px solid var(--border-sage-active);
+            color: var(--text-sage-deep);
+            box-shadow: 0 4px 14px rgba(172, 209, 199, 0.25);
+        }
+
+        .task-left-group {
             display: flex;
             align-items: center;
             gap: 10px;
+            flex: 1;
+            min-width: 0;
         }
 
-        /* Circular minimalist play/stop buttons */
-        .play-btn {
-            width: 24px;
-            height: 24px;
+        /* Play / Pause Toggle Button */
+        .btn-play-pause {
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            border: 1px solid #E2E2E2;
-            background: #FFFFFF;
-            color: var(--text-dark);
+            border: 1px solid var(--border-idle);
+            background: #FAFAFA;
+            color: var(--text-idle-dark);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 0.7rem;
-            padding: 0;
+            font-size: 0.75rem;
+            flex-shrink: 0;
             transition: all 0.2s ease;
         }
-        .play-btn:hover { background: #FDFDFD; border-color: var(--grey-text); }
-        .play-btn.active {
-            background: var(--pink-accent);
-            border-color: var(--pink-accent);
+
+        .btn-play-pause:hover {
+            background: #FFFFFF;
+            transform: scale(1.05);
+            border-color: #D8C3CC;
         }
 
-        .task-meta {
-            display: flex;
-            flex-direction: column;
+        .task-card.is-playing .btn-play-pause {
+            background: var(--text-sage-deep);
+            color: #FFFFFF;
+            border-color: var(--text-sage-deep);
         }
 
-        .task-name {
-            font-size: 0.9rem;
+        .task-card.is-playing .btn-play-pause:hover {
+            background: #1E3E37;
+        }
+
+        .task-title {
+            font-size: 0.88rem;
+            line-height: 1.3;
+            word-break: break-word;
+            flex: 1;
+        }
+
+        .task-card.is-playing .task-title {
+            color: var(--text-sage-deep);
             font-weight: 500;
-            color: var(--text-dark);
         }
 
-        .time-spent-label {
-            font-size: 0.72rem;
-            color: var(--grey-text);
-            margin-top: 1px;
-        }
-
-        .task-right {
+        .task-right-group {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            flex-shrink: 0;
         }
 
-        .live-counter {
-            font-size: 0.9rem;
+        /* Timer Badge Display */
+        .timer-badge {
+            font-family: 'Alice', serif;
+            font-size: 0.82rem;
+            padding: 4px 10px;
+            border-radius: 8px;
+            background: #F8F5F7;
+            color: var(--text-idle-grey);
+            border: 1px solid var(--border-idle);
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.25s ease;
+        }
+
+        /* Mint Pulse Animation on Active Timer Badge */
+        .task-card.is-playing .timer-badge {
+            background: #D2EBD2;
+            color: var(--text-sage-deep);
+            border-color: var(--border-sage-active);
             font-weight: bold;
-            color: var(--text-dark);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            animation: mintPulse 2s infinite ease-in-out;
         }
 
+        @keyframes mintPulse {
+            0% {
+                box-shadow: 0 0 0 0 var(--mint-badge-glow);
+            }
+            50% {
+                box-shadow: 0 0 0 6px rgba(172, 209, 199, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(172, 209, 199, 0);
+            }
+        }
+
+        /* Delete Task Button */
         .btn-delete {
             background: none;
             border: none;
-            color: #CCCCCC;
+            color: var(--text-idle-grey);
+            font-size: 0.95rem;
             cursor: pointer;
-            font-size: 0.75rem;
-            padding: 4px;
+            padding: 2px 4px;
+            line-height: 1;
+            opacity: 0.6;
+            transition: all 0.2s ease;
         }
-        .btn-delete:hover { color: var(--grey-text); }
 
-        /* Minimal Input Area */
-        .input-bar {
+        .btn-delete:hover {
+            opacity: 1;
+            color: #B84258;
+        }
+
+        /* 4. Inline Add Task Drawer */
+        .add-drawer {
+            background: #FAF5F7;
+            border: 1px dashed var(--border-idle);
+            border-radius: 14px;
+            padding: 8px 10px;
             display: flex;
-            border-top: 1px solid #EBEBEB;
-            background: var(--bg-light);
+            gap: 8px;
+            align-items: center;
         }
 
-        .input-bar input {
+        .add-input {
             flex: 1;
-            border: none;
+            font-family: 'Alice', serif;
+            font-size: 0.82rem;
             padding: 8px 12px;
-            font-size: 0.8rem;
-            font-family: inherit;
-            color: var(--text-dark);
+            background: #ffffff;
+            border: 1px solid var(--border-idle);
+            border-radius: 10px;
+            color: var(--text-idle-dark);
             outline: none;
-            background: transparent;
+            transition: border-color 0.2s ease;
         }
-        .input-bar input::placeholder { color: #CCCCCC; }
 
-        .btn-add {
-            background: transparent;
-            color: var(--text-dark);
-            border: none;
-            padding: 0 14px;
-            font-size: 0.8rem;
-            font-family: inherit;
-            font-weight: bold;
-            cursor: pointer;
-            opacity: 0.8;
+        .add-input::placeholder {
+            color: var(--text-idle-grey);
+            font-style: italic;
         }
-        .btn-add:hover { opacity: 1; }
+
+        .add-input:focus {
+            border-color: #D8C3CC;
+        }
+
+        .btn-add-submit {
+            background: #ffffff;
+            border: 1px solid rgba(50, 37, 39, 0.2);
+            border-radius: 10px;
+            color: var(--text-idle-dark);
+            font-family: 'Alice', serif;
+            font-size: 0.78rem;
+            padding: 8px 14px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .btn-add-submit:hover {
+            background: var(--bg-powder-pink);
+            border-color: rgba(50, 37, 39, 0.3);
+        }
+
+        /* Toast Feedback Overlay */
+        .toast-msg {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-idle-dark);
+            color: #ffffff;
+            font-size: 0.7rem;
+            padding: 4px 12px;
+            border-radius: 8px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .toast-msg.show {
+            opacity: 1;
+            bottom: 16px;
+        }
     </style>
 </head>
 <body>
 
 <div class="widget-container">
-    <div class="header-bar">
-        <div class="header-title">Time Tracker ⚡️</div>
-        <button class="btn-reset" onclick="resetAll()">Clear</button>
+    <!-- Header Banner -->
+    <div class="header-banner">
+        <div class="header-title">
+            <span>TIME TRACKER ⏳</span>
+        </div>
+        <button class="btn-clear-all" onclick="clearAllTasks()" title="Reset all tasks and timers">Clear All</button>
     </div>
 
-    <div class="task-list" id="taskList"></div>
-
-    <div class="input-bar">
-        <input type="text" id="taskInput" placeholder="add a task...">
-        <button class="btn-add" onclick="addTask()">Add</button>
+    <!-- Active Session Stats -->
+    <div class="stats-summary">
+        <span class="stats-count" id="taskCountLabel">Tasks: <strong>0</strong></span>
+        <span id="totalTimeLabel">Total Tracked: <strong>00:00:00</strong></span>
     </div>
+
+    <!-- Task List Container -->
+    <div class="task-list" id="taskListContainer"></div>
+
+    <!-- Add Task Input Form -->
+    <div class="add-drawer">
+        <input type="text" class="add-input" id="newTaskInput" placeholder="Enter task name to track..." onkeydown="handleInputKeyPress(event)" />
+        <button class="btn-add-submit" onclick="addNewTask()">+ Add Task</button>
+    </div>
+
+    <!-- Feedback Toast -->
+    <div class="toast-msg" id="toastMsg">Notification</div>
 </div>
 
 <script>
-    let tasks = JSON.parse(localStorage.getItem('notion_serif_tracker_bolt')) || [];
-    let activeTaskId = null;
+    const STORAGE_KEY = 'quiet_luxury_time_tracker_v1';
+
+    // Default Seed Data
+    const defaultTasks = [
+        { id: 1, title: "Deep Work: Strategy & Design", seconds: 124, isPlaying: false },
+        { id: 2, title: "Review Client Deliverables", seconds: 0, isPlaying: false }
+    ];
+
+    let tasks = [];
     let timerInterval = null;
 
-    function formatTime(totalSeconds) {
-        const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
-        const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
-        const secs = String(totalSeconds % 60).padStart(2, '0');
-        return `${hours}:${minutes}:${secs}`;
-    }
-
-    function formatSpentText(totalSeconds) {
-        if (totalSeconds < 60) return "0m spent";
-        const hours = Math.floor(totalSeconds / 3600);
-        const minutes = Math.floor((totalSeconds % 3600) / 60);
-        
-        if (hours > 0) {
-            return `${hours}h ${minutes}m spent`;
+    // Resilient LocalStorage Load
+    function safeLoadTasks() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                tasks = JSON.parse(raw);
+                // Pause all timers on fresh page reload
+                tasks.forEach(t => t.isPlaying = false);
+            } else {
+                tasks = [...defaultTasks];
+            }
+        } catch (e) {
+            console.warn("LocalStorage unaccessible (iframe/security policy). Running in-memory.", e);
+            tasks = [...defaultTasks];
         }
-        return `${minutes}m spent`;
     }
 
-    function saveAndRender() {
-        localStorage.setItem('notion_serif_tracker_bolt', JSON.stringify(tasks));
-        const listEl = document.getElementById('taskList');
-        listEl.innerHTML = '';
+    // Resilient LocalStorage Save
+    function safeSaveTasks() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+        } catch (e) {
+            console.warn("Unable to save to LocalStorage.", e);
+        }
+    }
 
-        tasks.forEach(task => {
-            const item = document.createElement('div');
-            item.className = 'task-item';
-            const isActive = task.id === activeTaskId;
+    // Format Seconds into HH:MM:SS or MM:SS
+    function formatTime(totalSeconds) {
+        const hrs = Math.floor(totalSeconds / 3600);
+        const mins = Math.floor((totalSeconds % 3600) / 60);
+        const secs = totalSeconds % 60;
 
-            item.innerHTML = `
-                <div class="task-left">
-                    <button class="play-btn ${isActive ? 'active' : ''}" onclick="toggleTask(${task.id})">
-                        ${isActive ? '■' : '▶'}
-                    </button>
-                    <div class="task-meta">
-                        <span class="task-name">${task.name}</span>
-                        <span class="time-spent-label">${formatSpentText(task.seconds)}</span>
-                    </div>
-                </div>
-                <div class="task-right">
-                    <span class="live-counter">${formatTime(task.seconds)}</span>
-                    <button class="btn-delete" onclick="deleteTask(${task.id})">✕</button>
+        const pad = num => String(num).padStart(2, '0');
+
+        if (hrs > 0) {
+            return `${pad(hrs)}:${pad(mins)}:${pad(secs)}`;
+        }
+        return `${pad(mins)}:${pad(secs)}`;
+    }
+
+    // Format Total Overall Time (Always HH:MM:SS)
+    function formatTotalTime(totalSeconds) {
+        const hrs = Math.floor(totalSeconds / 3600);
+        const mins = Math.floor((totalSeconds % 3600) / 60);
+        const secs = totalSeconds % 60;
+        const pad = num => String(num).padStart(2, '0');
+        return `${pad(hrs)}:${pad(mins)}:${pad(secs)}`;
+    }
+
+    function renderTasks() {
+        const container = document.getElementById('taskListContainer');
+        container.innerHTML = '';
+
+        if (tasks.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; font-style: italic; color: var(--text-idle-grey); font-size: 0.8rem; padding: 16px 0;">
+                    No active tasks. Add a task above to begin tracking 🌿
                 </div>
             `;
-            listEl.appendChild(item);
-        });
-    }
-
-    function addTask() {
-        const input = document.getElementById('taskInput');
-        if (!input.value.trim()) return;
-        
-        tasks.push({
-            id: Date.now(),
-            name: input.value.trim(),
-            seconds: 0
-        });
-        input.value = '';
-        saveAndRender();
-    }
-
-    function toggleTask(id) {
-        if (activeTaskId === id) {
-            clearInterval(timerInterval);
-            activeTaskId = null;
         } else {
-            clearInterval(timerInterval);
-            activeTaskId = id;
+            tasks.forEach(task => {
+                const card = document.createElement('div');
+                card.className = `task-card ${task.isPlaying ? 'is-playing' : ''}`;
+                card.id = `task-card-${task.id}`;
+
+                const playSymbol = task.isPlaying ? '⏸' : '▶';
+
+                card.innerHTML = `
+                    <div class="task-left-group">
+                        <button class="btn-play-pause" onclick="toggleTaskTimer(${task.id})" title="${task.isPlaying ? 'Pause timer' : 'Start timer'}">
+                            ${playSymbol}
+                        </button>
+                        <span class="task-title">${escapeHtml(task.title)}</span>
+                    </div>
+                    <div class="task-right-group">
+                        <div class="timer-badge" id="timer-badge-${task.id}">
+                            ${task.isPlaying ? '⏱ ' : ''}${formatTime(task.seconds)}
+                        </div>
+                        <button class="btn-delete" onclick="deleteTask(${task.id})" title="Delete task">×</button>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        updateStatsSummary();
+    }
+
+    // Update Summary Header Counts
+    function updateStatsSummary() {
+        const countElem = document.getElementById('taskCountLabel');
+        const totalElem = document.getElementById('totalTimeLabel');
+
+        const totalSecs = tasks.reduce((acc, t) => acc + t.seconds, 0);
+
+        if (countElem) countElem.innerHTML = `Tasks: <strong>${tasks.length}</strong>`;
+        if (totalElem) totalElem.innerHTML = `Total Tracked: <strong>${formatTotalTime(totalSecs)}</strong>`;
+    }
+
+    // Toggle Play/Pause per Task (Auto-pauses all other tasks)
+    function toggleTaskTimer(id) {
+        const targetTask = tasks.find(t => t.id === id);
+        if (!targetTask) return;
+
+        const isCurrentlyPlaying = targetTask.isPlaying;
+
+        // Auto-pause every task first
+        tasks.forEach(t => t.isPlaying = false);
+
+        // If target was not playing, set it to playing
+        if (!isCurrentlyPlaying) {
+            targetTask.isPlaying = true;
+            showToast(`Started: "${targetTask.title}" ✨`);
+        } else {
+            showToast(`Paused timer`);
+        }
+
+        safeSaveTasks();
+        renderTasks();
+        checkGlobalTimerLoop();
+    }
+
+    // Global Tick Loop (Runs every second when at least one task is active)
+    function checkGlobalTimerLoop() {
+        const activeTask = tasks.find(t => t.isPlaying);
+
+        if (activeTask && !timerInterval) {
             timerInterval = setInterval(() => {
-                const task = tasks.find(t => t.id === activeTaskId);
-                if (task) {
-                    task.seconds++;
-                    saveAndRender();
+                const currentActive = tasks.find(t => t.isPlaying);
+                if (currentActive) {
+                    currentActive.seconds += 1;
+                    
+                    // DOM-efficient update to avoid re-rendering input focus
+                    const badge = document.getElementById(`timer-badge-${currentActive.id}`);
+                    if (badge) {
+                        badge.innerHTML = `⏱ ${formatTime(currentActive.seconds)}`;
+                    }
+                    updateStatsSummary();
+                } else {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
                 }
             }, 1000);
+        } else if (!activeTask && timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
         }
-        saveAndRender();
     }
 
+    // Add New Task Logic
+    function addNewTask() {
+        const input = document.getElementById('newTaskInput');
+        const title = input.value.trim();
+
+        if (title === '') return;
+
+        const newTask = {
+            id: Date.now(),
+            title: title,
+            seconds: 0,
+            isPlaying: false
+        };
+
+        tasks.push(newTask);
+        safeSaveTasks();
+        renderTasks();
+
+        input.value = '';
+        showToast("New task created 🌱");
+    }
+
+    function handleInputKeyPress(event) {
+        if (event.key === 'Enter') {
+            addNewTask();
+        }
+    }
+
+    // Delete Individual Task
     function deleteTask(id) {
-        if (activeTaskId === id) {
-            clearInterval(timerInterval);
-            activeTaskId = null;
-        }
         tasks = tasks.filter(t => t.id !== id);
-        saveAndRender();
+        safeSaveTasks();
+        renderTasks();
+        checkGlobalTimerLoop();
+        showToast("Task deleted");
     }
 
-    function resetAll() {
-        if (confirm("Clear all items?")) {
+    // Clear All Tasks
+    function clearAllTasks() {
+        if (tasks.length === 0) {
+            showToast("No tasks to clear");
+            return;
+        }
+        
+        tasks = [];
+        if (timerInterval) {
             clearInterval(timerInterval);
-            activeTaskId = null;
-            tasks = [];
-            saveAndRender();
+            timerInterval = null;
+        }
+        safeSaveTasks();
+        renderTasks();
+        showToast("Cleared all tasks 🌸");
+    }
+
+    // Toast Notification helper
+    function showToast(msg) {
+        const toast = document.getElementById('toastMsg');
+        if (toast) {
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2200);
         }
     }
 
-    document.getElementById('taskInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') addTask();
-    });
+    function escapeHtml(str) {
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
 
-    saveAndRender();
+    // Resilient Initialization on DOMContentLoaded
+    function initTracker() {
+        safeLoadTasks();
+        renderTasks();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initTracker);
+    } else {
+        initTracker();
+    }
 </script>
-
 </body>
 </html>
